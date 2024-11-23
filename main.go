@@ -21,6 +21,18 @@ type Proxy struct {
 	Path      string            `json:"path"`
 	RemoteURL string            `json:"remote_url"`
 	Headers   map[string]string `json:"headers"`
+	Debug     bool              `json:"debug"`
+}
+
+type DebugTransport struct{}
+
+func (DebugTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	b, err := httputil.DumpRequestOut(r, true)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(string(b))
+	return http.DefaultTransport.RoundTrip(r)
 }
 
 func main() {
@@ -45,6 +57,11 @@ func main() {
 			}
 
 			reverseProxy := httputil.NewSingleHostReverseProxy(remote)
+
+			if proxy.Debug {
+				reverseProxy.Transport = DebugTransport{}
+			}
+
 			reverseProxy.Director = func(req *http.Request) {
 				req.Header = c.Request.Header
 				req.Host = remote.Host

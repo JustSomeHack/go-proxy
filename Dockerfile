@@ -16,6 +16,4 @@ COPY --from=builder /app/build/docker/go-proxy /app/
 
 RUN chmod +x /app/go-proxy
 
-EXPOSE 8088
-
 ENTRYPOINT [ "/app/go-proxy"]
