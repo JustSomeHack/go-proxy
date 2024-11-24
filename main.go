@@ -71,6 +71,10 @@ func main() {
 					req.Header.Set(key, value)
 				}
 
+				if proxy.Debug {
+					b, _ := httputil.DumpRequestOut(req, true)
+					log.Println(string(b))
+				}
 				log.Printf("Forwarding request from %s to %s\n", req.RemoteAddr, req.URL)
 			}
 
